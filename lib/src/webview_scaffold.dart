@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_webview_plugin/src/javascript_channel.dart';
@@ -11,32 +13,32 @@ class WebviewScaffold extends StatefulWidget {
     this.appBar,
     required this.url,
     this.headers,
-    this.javascriptChannels,
-    this.withJavascript,
-    this.clearCache,
-    this.clearCookies,
+    this.javascriptChannels = const <JavascriptChannel>{},
+    this.withJavascript = true,
+    this.clearCache = false,
+    this.clearCookies = false,
     this.mediaPlaybackRequiresUserGesture = true,
-    this.enableAppScheme,
+    this.enableAppScheme = true,
     this.userAgent,
     this.primary = true,
     this.persistentFooterButtons,
     this.bottomNavigationBar,
-    this.withZoom,
-    this.displayZoomControls,
-    this.withLocalStorage,
-    this.withLocalUrl,
+    this.withZoom = false,
+    this.displayZoomControls = false,
+    this.withLocalStorage = true,
+    this.withLocalUrl = false,
     this.localUrlScope,
-    this.withOverviewMode,
-    this.useWideViewPort,
-    this.scrollBar,
-    this.supportMultipleWindows,
-    this.appCacheEnabled,
+    this.withOverviewMode = false,
+    this.useWideViewPort = false,
+    this.scrollBar = true,
+    this.supportMultipleWindows = false,
+    this.appCacheEnabled = false,
     this.hidden = false,
     this.initialChild,
-    this.allowFileURLs,
+    this.allowFileURLs = false,
     this.resizeToAvoidBottomInset = false,
     this.invalidUrlRegex,
-    this.geolocationEnabled,
+    this.geolocationEnabled = false,
     this.debuggingEnabled = false,
     this.ignoreSSLErrors = false,
   }) : super(key: key);
@@ -44,34 +46,34 @@ class WebviewScaffold extends StatefulWidget {
   final PreferredSizeWidget? appBar;
   final String url;
   final Map<String, String>? headers;
-  final Set<JavascriptChannel>? javascriptChannels;
-  final bool? withJavascript;
-  final bool? clearCache;
-  final bool? clearCookies;
-  final bool? mediaPlaybackRequiresUserGesture;
-  final bool? enableAppScheme;
+  final Set<JavascriptChannel> javascriptChannels;
+  final bool withJavascript;
+  final bool clearCache;
+  final bool clearCookies;
+  final bool mediaPlaybackRequiresUserGesture;
+  final bool enableAppScheme;
   final String? userAgent;
-  final bool? primary;
+  final bool primary;
   final List<Widget>? persistentFooterButtons;
   final Widget? bottomNavigationBar;
-  final bool? withZoom;
-  final bool? displayZoomControls;
-  final bool? withLocalStorage;
-  final bool? withLocalUrl;
+  final bool withZoom;
+  final bool displayZoomControls;
+  final bool withLocalStorage;
+  final bool withLocalUrl;
   final String? localUrlScope;
-  final bool? scrollBar;
-  final bool? supportMultipleWindows;
-  final bool? appCacheEnabled;
-  final bool? hidden;
+  final bool scrollBar;
+  final bool supportMultipleWindows;
+  final bool appCacheEnabled;
+  final bool hidden;
   final Widget? initialChild;
-  final bool? allowFileURLs;
-  final bool? resizeToAvoidBottomInset;
+  final bool allowFileURLs;
+  final bool resizeToAvoidBottomInset;
   final String? invalidUrlRegex;
-  final bool? geolocationEnabled;
-  final bool? withOverviewMode;
-  final bool? useWideViewPort;
-  final bool? debuggingEnabled;
-  final bool? ignoreSSLErrors;
+  final bool geolocationEnabled;
+  final bool withOverviewMode;
+  final bool useWideViewPort;
+  final bool debuggingEnabled;
+  final bool ignoreSSLErrors;
 
   @override
   _WebviewScaffoldState createState() => _WebviewScaffoldState();
@@ -83,7 +85,7 @@ class _WebviewScaffoldState extends State<WebviewScaffold> {
   Timer? _resizeTimer;
   StreamSubscription<WebViewStateChanged>? _onStateChanged;
 
-  var _onBack;
+  StreamSubscription? _onBack;
 
   @override
   void initState() {
@@ -108,7 +110,7 @@ class _WebviewScaffoldState extends State<WebviewScaffold> {
       }
     });
 
-    if (widget.hidden ?? false) {
+    if (widget.hidden) {
       _onStateChanged =
           webviewReference.onStateChanged.listen((WebViewStateChanged state) {
         if (state.type == WebViewState.finishLoad) {
@@ -120,12 +122,12 @@ class _WebviewScaffoldState extends State<WebviewScaffold> {
 
   /// Equivalent to [Navigator.of(context)._history.last].
   Route<dynamic> get _topMostRoute {
-    var topMost;
+    Route? topMost;
     Navigator.popUntil(context, (route) {
       topMost = route;
       return true;
     });
-    return topMost;
+    return topMost!;
   }
 
   @override
@@ -134,8 +136,8 @@ class _WebviewScaffoldState extends State<WebviewScaffold> {
     _onBack?.cancel();
     _resizeTimer?.cancel();
     webviewReference.close();
-    if (widget.hidden ?? false) {
-      _onStateChanged!.cancel();
+    if (widget.hidden) {
+      _onStateChanged?.cancel();
     }
     webviewReference.dispose();
   }
@@ -192,7 +194,7 @@ class _WebviewScaffoldState extends State<WebviewScaffold> {
           }
         },
         child: widget.initialChild ??
-            const Center(child: const CircularProgressIndicator()),
+            const Center(child: CircularProgressIndicator()),
       ),
     );
   }
@@ -224,11 +226,14 @@ class _WebviewPlaceholder extends SingleChildRenderObjectWidget {
 class _WebviewPlaceholderRender extends RenderProxyBox {
   _WebviewPlaceholderRender({
     RenderBox? child,
-    required ValueChanged<Rect> onRectChanged,
+    ValueChanged<Rect>? onRectChanged,
   })  : _callback = onRectChanged,
         super(child);
 
-  late ValueChanged<Rect> _callback;
+  ValueChanged<Rect>? _callback;
+  Rect? _rect;
+
+  Rect get rect => _rect!;
 
   set onRectChanged(ValueChanged<Rect> callback) {
     if (callback != _callback) {
@@ -237,10 +242,19 @@ class _WebviewPlaceholderRender extends RenderProxyBox {
     }
   }
 
-  void notifyRect() {}
+  void notifyRect() {
+    if (_callback != null && _rect != null) {
+      _callback!(_rect!);
+    }
+  }
 
   @override
   void paint(PaintingContext context, Offset offset) {
     super.paint(context, offset);
+    final rect = offset & size;
+    if (_rect != rect) {
+      _rect = rect;
+      notifyRect();
+    }
   }
 }

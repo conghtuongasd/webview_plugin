@@ -15,7 +15,6 @@ import android.os.Build;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -45,6 +44,7 @@ public class FlutterWebviewPlugin implements FlutterPlugin, ActivityAware, Metho
     }
 
     public FlutterWebviewPlugin() {}
+
 
     FlutterWebviewPlugin(Activity activity, Context context) {
         this.activity = activity;
