@@ -15,7 +15,7 @@ class FlutterWebviewPlugin {
       const MethodChannel methodChannel = const MethodChannel(_kChannel);
       _instance = FlutterWebviewPlugin.private(methodChannel);
     }
-    return _instance;
+    return _instance!;
   }
 
   @visibleForTesting
@@ -23,7 +23,7 @@ class FlutterWebviewPlugin {
     _channel.setMethodCallHandler(_handleMessages);
   }
 
-  static FlutterWebviewPlugin _instance;
+  static FlutterWebviewPlugin? _instance;
 
   final MethodChannel _channel;
 
@@ -137,31 +137,31 @@ class FlutterWebviewPlugin {
   /// - [ignoreSSLErrors]: use to bypass Android/iOS SSL checks e.g. for self-signed certificates
   Future<Null> launch(
     String url, {
-    Map<String, String> headers,
-    Set<JavascriptChannel> javascriptChannels,
-    bool withJavascript,
-    bool clearCache,
-    bool clearCookies,
-    bool mediaPlaybackRequiresUserGesture,
-    bool hidden,
-    bool enableAppScheme,
-    Rect rect,
-    String userAgent,
-    bool withZoom,
-    bool displayZoomControls,
-    bool withLocalStorage,
-    bool withLocalUrl,
-    String localUrlScope,
-    bool withOverviewMode,
-    bool scrollBar,
-    bool supportMultipleWindows,
-    bool appCacheEnabled,
-    bool allowFileURLs,
-    bool useWideViewPort,
-    String invalidUrlRegex,
-    bool geolocationEnabled,
-    bool debuggingEnabled,
-    bool ignoreSSLErrors,
+    Map<String, String>? headers,
+    Set<JavascriptChannel>? javascriptChannels,
+    bool? withJavascript,
+    bool? clearCache,
+    bool? clearCookies,
+    bool? mediaPlaybackRequiresUserGesture,
+    bool? hidden,
+    bool? enableAppScheme,
+    Rect? rect,
+    String? userAgent,
+    bool? withZoom,
+    bool? displayZoomControls,
+    bool? withLocalStorage,
+    bool? withLocalUrl,
+    String? localUrlScope,
+    bool? withOverviewMode,
+    bool? scrollBar,
+    bool? supportMultipleWindows,
+    bool? appCacheEnabled,
+    bool? allowFileURLs,
+    bool? useWideViewPort,
+    String? invalidUrlRegex,
+    bool? geolocationEnabled,
+    bool? debuggingEnabled,
+    bool? ignoreSSLErrors,
   }) async {
     final args = <String, dynamic>{
       'url': url,
@@ -259,7 +259,7 @@ class FlutterWebviewPlugin {
   Future<Null> clearCache() async => await _channel.invokeMethod('cleanCache');
 
   // Reload webview with a url
-  Future<Null> reloadUrl(String url, {Map<String, String> headers}) async {
+  Future<Null> reloadUrl(String url, {Map<String, String>? headers}) async {
     final args = <String, dynamic>{'url': url};
     if (headers != null) {
       args['headers'] = headers;
@@ -296,7 +296,7 @@ class FlutterWebviewPlugin {
     final cookiesString = await evalJavascript('document.cookie');
     final cookies = <String, String>{};
 
-    if (cookiesString?.isNotEmpty == true) {
+    if (cookiesString.isNotEmpty == true) {
       cookiesString.split(';').forEach((String cookie) {
         final split = cookie.split('=');
         cookies[split[0]] = split[1];
@@ -318,7 +318,7 @@ class FlutterWebviewPlugin {
     await _channel.invokeMethod('resize', args);
   }
 
-  Set<String> _extractJavascriptChannelNames(Set<JavascriptChannel> channels) {
+  Set<String> _extractJavascriptChannelNames(Set<JavascriptChannel>? channels) {
     final Set<String> channelNames = channels == null
         // ignore: prefer_collection_literals
         ? Set<String>()
@@ -328,12 +328,12 @@ class FlutterWebviewPlugin {
 
   void _handleJavascriptChannelMessage(
       final String channelName, final String message) {
-    _javascriptChannels[channelName]
+    _javascriptChannels[channelName]!
         .onMessageReceived(JavascriptMessage(message));
   }
 
   void _assertJavascriptChannelNamesAreUnique(
-      final Set<JavascriptChannel> channels) {
+      final Set<JavascriptChannel>? channels) {
     if (channels == null || channels.isEmpty) {
       return;
     }
@@ -346,7 +346,7 @@ class WebViewStateChanged {
   WebViewStateChanged(this.type, this.url, this.navigationType);
 
   factory WebViewStateChanged.fromMap(Map<String, dynamic> map) {
-    WebViewState t;
+    WebViewState? t;
     switch (map['type']) {
       case 'shouldStart':
         t = WebViewState.shouldStart;
@@ -364,9 +364,9 @@ class WebViewStateChanged {
     return WebViewStateChanged(t, map['url'], map['navigationType']);
   }
 
-  final WebViewState type;
-  final String url;
-  final int navigationType;
+  final WebViewState? type;
+  final String? url;
+  final int? navigationType;
 }
 
 class WebViewHttpError {

@@ -257,10 +257,10 @@
       "name": "flutter_webview_plugin",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "2.0"
+      "languageVersion": "2.15"
     }
   ],
-  "generated": "2022-01-22T03:59:16.201426Z",
+  "generated": "2022-01-22T04:08:36.408603Z",
   "generator": "pub",
   "generatorVersion": "2.15.1"
 }
