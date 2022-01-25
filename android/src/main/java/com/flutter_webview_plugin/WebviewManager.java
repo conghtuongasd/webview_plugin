@@ -393,8 +393,6 @@ class WebviewManager {
         webView.getSettings().setSupportMultipleWindows(supportMultipleWindows);
 
         webView.getSettings().setAppCacheEnabled(appCacheEnabled);
-        webView.getSettings().setAcceptThirdPartyCookies(true);
-
         webView.getSettings().setAllowFileAccessFromFileURLs(allowFileURLs);
         webView.getSettings().setAllowUniversalAccessFromFileURLs(allowFileURLs);
 
@@ -402,6 +400,10 @@ class WebviewManager {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             webView.getSettings().setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture);
+        }
+
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(webView,true);
         }
 
         // Handle debugging
